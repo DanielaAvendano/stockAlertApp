@@ -54,9 +54,12 @@ npm install
 ### Environment Variables
 
 Create a .env file in the root:
+
+```
 EXPO_PUBLIC_API_URL=https://finnhub.io/api/v1/
 EXPO_PUBLIC_API_KEY=YOUR_FINNHUB_API_KEY
 EXPO_PUBLIC_WEBSOCKET_URL=wss://ws.finnhub.io
+```
 
 
 
