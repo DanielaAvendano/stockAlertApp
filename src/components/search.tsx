@@ -40,7 +40,7 @@ export const FinnhubSymbolSearch = () => {
       dispatch(
         searchStocks({
           query: searchQuery.trim(),
-          token: "d3a3ur1r01qli8jcih30d3a3ur1r01qli8jcih3g",
+          token: process.env.EXPO_PUBLIC_API_KEY!,
         })
       );
     }
