@@ -46,9 +46,9 @@ A modern **React Native** application for tracking stock prices and setting pric
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/stock-alert-app.git
-cd stock-alert-app
-yarn install
+git@github.com:DanielaAvendano/stockAlertApp.git
+cd stockAlertApp
+npm install
 ```
 
 ### Environment Variables
