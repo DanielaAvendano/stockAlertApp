@@ -1,6 +1,7 @@
+import * as Notifications from 'expo-notifications';
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updatePrice } from "../redux/slices/stocksSlice";
+import { triggerAlert, updatePrice } from "../redux/slices/stocksSlice";
 import { RootState } from "../redux/store";
 
 export const useFinnhubWS = (token: string) => {
@@ -13,57 +14,58 @@ export const useFinnhubWS = (token: string) => {
 
   useEffect(() => {
     if (!WEB_SOCKET_URL || !token || selectedStocks.length === 0) return;
-
-    console.log("Connecting to Finnhub WebSocket...", selectedStocks.map(s => s.symbol));
-    
+  
     const socket = new WebSocket(`${WEB_SOCKET_URL}?token=${token}`);
     socketRef.current = socket;
 
     socket.onopen = () => {
-      console.log("✅ WebSocket connected");
-
-      // subscribe to each selected stock
       selectedStocks.forEach((stock) => {
-        const symbol = stock.symbol; // make sure this matches Finnhub format
+        const symbol = stock.symbol;
         const subscribeMsg = JSON.stringify({ type: "subscribe", symbol });
-        console.log("➡️ Subscribing to:", subscribeMsg);
         socket.send(subscribeMsg);
       });
     };
 
     socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
+        const msg = JSON.parse(event.data);
 
-        if (data.type === "ping") {
-          // keep-alive ping
-          return;
-        }
+        if (msg.type === "trade") {
+          msg.data.forEach(async (trade: any) => {
+            const { s: symbol, p: price } = trade;
 
-        if (data.type === "trade" && data.data) {
-          data.data.forEach((trade: any) => {
-            console.log("📈 Trade update:", trade);
-            dispatch(updatePrice({ 
-              symbol: trade.s, 
-              price: trade.p,
-            }));
+            dispatch(updatePrice({ symbol, price }));
+
+            const stock = selectedStocks.find((st) => st.symbol === symbol);
+            if (stock?.alerts) {
+              stock.alerts.forEach(async (alert) => {
+                if (!alert.triggered && price >= alert.price) {
+          
+                  await Notifications.scheduleNotificationAsync({
+                    content: {
+                      title: `${symbol} reached $${price.toFixed(2)}`,
+                      body: `Your alert at $${alert.price.toFixed(2)} was triggered.`,
+                    },
+                    trigger: null,
+                  });
+
+                  // Use Redux action instead of direct mutation
+                  dispatch(triggerAlert({ symbol, alertPrice: alert.price }));
+                }
+              });
+            }
           });
         }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    };
+      };
 
     socket.onerror = (error) => {
-      console.error("❌ WebSocket error:", error);
+      console.error("WebSocket error:", error);
     };
 
     socket.onclose = (event) => {
-      console.log("⚠️ WebSocket closed:", event.code, event.reason);
+      console.log("WebSocket closed:", event.code, event.reason);
     };
 
     return () => {
-      console.log("Cleaning up WebSocket...");
       if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         selectedStocks.forEach((stock) => {
           try {

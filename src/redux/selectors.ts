@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { StocksState } from "../types/stocks";
+import { AlertStock, StocksState } from "../types/stocks";
 
 export const selectSelectedStocks = (state: { stocks: StocksState }) =>
   state.stocks.selectedStocks;
@@ -15,12 +15,16 @@ export const selectSearchError = (state: { stocks: StocksState }) =>
 
 export const selectAlerts = createSelector(
   [selectSelectedStocks],
-  (selectedStocks) =>
+  (selectedStocks): AlertStock[] =>
     selectedStocks.flatMap((s) =>
       (s.alerts ?? []).map((a) => ({
         symbol: s.symbol,
         description: s.description,
-        ...a,
+        displaySymbol: s.displaySymbol, 
+        type: s.type,               
+        price: a.price,
+        createdAt: a.createdAt,
+        triggered: a.triggered,
       }))
     )
 );

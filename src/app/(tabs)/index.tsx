@@ -1,14 +1,22 @@
 import { selectAlerts } from "@/src/redux/selectors";
+import { AlertStock } from "@/src/types/stocks";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import {
+  FlatList,
+  ListRenderItem,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 export default function HomeScreen() {
   const alerts = useSelector(selectAlerts);
-
-  const renderAlertItem = ({ item }: any) => (
+  const renderAlertItem: ListRenderItem<AlertStock> = ({ item }) => (
     <View style={styles.alertCard}>
       <View style={styles.alertHeader}>
         <View style={styles.symbolContainer}>

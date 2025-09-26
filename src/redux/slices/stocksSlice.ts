@@ -134,7 +134,26 @@ const stocksSlice = createSlice({
         stock.alerts.push({
           price: action.payload.price,
           createdAt: new Date().toISOString(),
+          triggered: false, 
         });
+      }
+    },
+
+    triggerAlert: (
+      state,
+      action: PayloadAction<{ symbol: string; alertPrice: number }>
+    ) => {
+      const stock = state.selectedStocks.find(
+        (s) => s.symbol === action.payload.symbol
+      );
+
+      if (stock?.alerts) {
+        const alert = stock.alerts.find(
+          (alert) => alert.price === action.payload.alertPrice && !alert.triggered
+        );
+        if (alert) {
+          alert.triggered = true;
+        }
       }
     },
   },
@@ -174,7 +193,7 @@ export const {
   clearSearchResults,
   setPriceAlert,
   removeStock,
+  triggerAlert, 
 } = stocksSlice.actions;
 
 export default stocksSlice.reducer;
-

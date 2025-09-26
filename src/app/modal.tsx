@@ -6,6 +6,8 @@ import { FinnhubSymbolSearch } from "../components/search";
 import { clearSearchResults, setPriceAlert } from "../redux/slices/stocksSlice";
 import { AppDispatch, RootState } from "../redux/store";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function ModalScreen() {
   const [alertPrice, setAlertPrice] = useState("");
   const dispatch = useDispatch<AppDispatch>();
@@ -28,30 +30,33 @@ export default function ModalScreen() {
   const lastSelected = selectedStocks[selectedStocks.length - 1];
 
   return (
-    <View style={styles.container}>
-      <FinnhubSymbolSearch />
+    <SafeAreaView style={[styles.container]}>
+      <View
+        style={{
+          justifyContent: "flex-end",
+        }}
+      >
+        <FinnhubSymbolSearch />
 
-      <Text style={styles.label}>Alert Price ($)</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="Enter price"
-        value={alertPrice}
-        onChangeText={setAlertPrice}
-      />
+        <Text style={styles.label}>Alert Price ($)</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          placeholder="Enter price"
+          value={alertPrice}
+          onChangeText={setAlertPrice}
+        />
 
-      <Button title="Save Alert" onPress={handleSave} />
-    </View>
+        <Button title="Save Alert" onPress={handleSave} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "white",
-    justifyContent: "center",
   },
   label: {
     fontSize: 16,

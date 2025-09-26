@@ -8,6 +8,12 @@ export interface FinnhubSymbol {
 export interface PriceAlert {
   price: number;
   createdAt: string;
+  triggered: boolean;
+}
+
+export interface AlertStock extends FinnhubSymbol {
+  price: number;
+  createdAt: string | number | Date;
 }
 export interface LivePrice {
   price: number;
